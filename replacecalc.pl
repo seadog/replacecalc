@@ -43,14 +43,41 @@ sub replace {
     return unless $witem;
 
     while($data =~ /\@\{([^\}]+)\}\@/){
-        my $url = "http://www.google.com/ig/calculator?num=1&q=".uri_escape($1);
-        my $response = $agent->get($url);
-        my $json = new JSON::PP;
-        my $text = $response->content;
-        $text =~ s/([a-z]+)\:/\"$1\"\:/g;
-        my $jsontext = $json->decode($text);
+        my $parseurl = $1;
+        my $dp = -1;
 
-        my $result = $jsontext->{rhs};
+        if($parseurl =~ /([^|]+) *\| *([0-9]+)/){
+            $parseurl = $1;
+            $dp = $2;
+        }
+
+        if($dp > 7){
+            $dp = 7;
+        }
+
+        my $url = "http://www.google.com/ig/calculator?num=1&q=".uri_escape($parseurl);
+
+        my $response = $agent->get($url)->content;
+        $response =~ s/([a-z]+)\:/\"$1\"\:/g;
+
+        $response =~ s/\\x26#215;/x/g;
+        $response =~ s/\\x3csup\\x3e/ ^ /g;
+        $response =~ s/\\x3c\/sup\\x3e//g;
+
+        my $result = (new JSON::PP)->decode($response)->{rhs};
+        print $result;
+
+        $result =~ s/[^-0-9.,x ^]//g;
+
+        # if we're dealing with a an exponent number the we need to handle it properly
+        # otherwise, if we need to do some rounding then do that
+        # otherwise there are no changes to be made
+        if($result =~ /(-?[0-9.]+) x 10 \^ (-?[0-9]+)/){
+            $result = sprintf "%.".$dp."f x 10 ^ %d", $1, $2;
+        } elsif($dp != -1) {
+            $result = sprintf "%.".$dp."f", $result;
+        }
+
         $data =~ s/\@\{[^\}]+\}\@/$result/;
     }
 
