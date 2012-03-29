@@ -65,7 +65,6 @@ sub replace {
         $response =~ s/\\x3c\/sup\\x3e//g;
 
         my $result = (new JSON::PP)->decode($response)->{rhs};
-        print $result;
 
         $result =~ s/[^-0-9.,x ^]//g;
 
