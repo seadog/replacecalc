@@ -4,7 +4,7 @@ use vars qw($VERSION %IRSSI);
 use Irssi;
 use URI::Escape;
 use LWP::UserAgent;
-use JSON;
+use JSON::PP;
 
 $VERSION = '1.0';
 %IRSSI = (
@@ -25,7 +25,7 @@ sub replace {
     while($data =~ /\@\{([^\}]+)\}\@/){
         my $url = "http://www.google.com/ig/calculator?num=1&q=".uri_escape($1);
         my $response = $agent->get($url);
-        my $json = new JSON;
+        my $json = new JSON::PP;
         my $text = $response->content;
         $text =~ s/([a-z]+)\:/\"$1\"\:/g;
         my $jsontext = $json->decode($text);
