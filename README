@@ -1,6 +1,6 @@
 Replacecalc (better name pending...) is a script for irssi that allows you to do calculations using google calculator which will replace text you've typed.
 
-For example, sending "4+7 = @{4+7}" will send to the irc server "4+7 = 11" automatically, allowing you to not have to leave irssi to do a calculation you want to show people.
+For example, sending "4+7 = @{4+7}@" will send to the irc server "4+7 = 11" automatically, allowing you to not have to leave irssi to do a calculation you want to show people.
 
 The script supports all the functions that google calculator does as the text between the @{}@ is sent to the google calculator api.
  
