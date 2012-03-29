@@ -64,7 +64,9 @@ sub replace {
         $response =~ s/\\x3csup\\x3e/ ^ /g;
         $response =~ s/\\x3c\/sup\\x3e//g;
 
-        my $result = (new JSON::PP)->decode($response)->{rhs};
+        my $json = (new JSON::PP)->decode($response);
+        my $error = $json->{error};
+        my $result = $json->{rhs};
 
         $result =~ s/[^-0-9.,x ^]//g;
 
@@ -78,6 +80,11 @@ sub replace {
         }
 
         $data =~ s/\@\{[^\}]+\}\@/$result/;
+
+        if($error != ""){
+            print "Sorry your query resulted in an error";
+            next;
+        }
     }
 
     $server->command("MSG $witem->{name} $data");
